@@ -1,0 +1,55 @@
+﻿body {
+    background-color: lightyellow;
+}
+
+
+.drug-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.drug-record {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.drug-info {
+    display: flex;
+    align-items: center;
+}
+
+.drug-image {
+    width: 80px; /* 調整圖片大小 */
+    margin-right: 10px; /* 設置圖片與詳細資訊間的間距 */
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+}
+
+.buttons {
+    margin-left: auto; /* 讓按鈕群組靠右 */
+}
+
+.btn-skip,
+.btn-taken {
+    background-color: blue; /* 按鈕背景色設為藍色 */
+    color: white; /* 文字顏色設為白色 */
+    border: none; /* 移除按鈕邊框 */
+    padding: 8px 12px; /* 調整按鈕內邊距 */
+    margin-right: 10px; /* 調整按鈕間距 */
+    cursor: pointer; /* 將滑鼠指標設為手型 */
+}
+
+.btn-finish{
+    background-color:darkblue;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    cursor:pointer;
+    align-items:center;
+}
+
+

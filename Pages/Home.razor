@@ -1,0 +1,86 @@
+﻿@page "/"
+
+@using System <!-- 引入 System 命名空間 -->
+@using System.Collections.Generic <!-- 引入 System.Collections.Generic 命名空間 -->
+@inject IJSRuntime jsRuntime
+
+
+<h3>@DateTime.Now.ToString("yyyy-MM-dd (dddd)")</h3>  <!-- 顯示當前日期和星期幾 -->
+<hr />
+<link href="css/Home.css" rel="stylesheet" />
+@if (drugRecords != null && drugRecords.Count > 0) //<!-- 如果藥物清單不為空且包含藥物 -->
+{
+    <div class="drug-list">
+        @foreach (var drug in drugRecords) //<!-- 遍歷藥物清單中的每個藥物 -->
+        {
+            <div class="drug-record">
+                <div class="drug-info">
+                    <img src="@drug.ImageUrl" alt="@drug.Name" class="drug-image" /><!-- 顯示藥物圖片 -->
+                    <div class="details">
+                <h4>@drug.Name</h4> <!-- 顯示藥物名稱 -->
+                        <label for="timeInput">時間:</label>
+                        <input type="time" id="timeInput" @bind="drug.Time" /><!-- 顯示當前時間 -->
+                <p>劑量: @drug.Dosage</p> <!-- 顯示藥物用量 -->
+                </div>
+              </div>
+                <div class="buttons">
+                    <button class="btn-skip" @onclick="() => OnSkipClicked(drug)">跳過</button> <!-- 跳過按鈕 -->
+                    <button class="btn-taken" @onclick="() => OnTakenClicked(drug)">吃藥</button> <!-- 已吃藥按鈕 -->
+                <div />
+            </div>
+          </div>
+        }
+     <hr />
+        <button class="btn-finish" @onclick="() => OnFinishClicked()">提交</button> <!-- 跳過按鈕 -->
+    </div>
+}
+else
+{
+    <p>No drugs to track today.</p> <!-- 如果藥物清單為空，顯示無藥物追蹤的訊息 -->
+}
+
+@code {
+    List<DrugRecord> drugRecords;
+    <!-- 建立藥物清單的變數 -->
+    protected override void OnInitialized() //<!-- 初始化方法 -->
+    {
+        // 初始化藥物清單（這裡是個範例）
+        drugRecords = new List<DrugRecord> //<!-- 新增三個藥物到藥物清單 -->
+        {
+            new DrugRecord { Name = "康肯", Dosage = "10mg", ImageUrl = "pill1.png" },
+            new DrugRecord { Name = "普立妥", Dosage = "20mg", ImageUrl = "pill2.jpg" },
+            new DrugRecord { Name = "得安穩", Dosage = "10mg", ImageUrl = "pill3.jpg" }
+        };
+    }
+
+    public class DrugRecord //<!-- 藥物記錄的類別 -->
+    {
+        public string Name { get; set; }
+        <!-- 藥物名稱屬性 -->
+        public string Dosage { get; set; }
+        <!-- 藥物用量屬性 -->
+        public string ImageUrl { get; set; }
+        <!-- 藥物圖片URL屬性 -->
+        public DateTime Time { get; set; } 
+        <!-- 藥物時間屬性 -->
+    }
+    void OnSkipClicked(DrugRecord drug)
+    {
+        // 執行你想要在按下 Skip 按鈕時執行的程式碼
+        // 這裡是示例程式碼，可以在點擊後改變按鈕背景色
+        string script = @"this.style.backgroundColor = 'black';";
+        jsRuntime.InvokeVoidAsync("eval", script);
+    }
+
+    void OnTakenClicked(DrugRecord drug)
+    {
+        // 執行你想要在按下 Taken 按鈕時執行的程式碼
+        // 這裡是示例程式碼，可以在點擊後改變按鈕背景色
+        string script = @"this.style.backgroundColor = 'black';";
+        jsRuntime.InvokeVoidAsync("eval", script);
+    }
+    void OnFinishClicked()
+    {
+        
+    }
+}
