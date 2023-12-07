@@ -66,16 +66,16 @@ else
     }
     void OnSkipClicked(DrugRecord drug)
     {
-        // 執行你想要在按下 Skip 按鈕時執行的程式碼
-        // 這裡是示例程式碼，可以在點擊後改變按鈕背景色
+        // 執行想要在按下 Skip 按鈕時執行的程式碼
+        // 可以在點擊後改變按鈕背景色
         string script = @"this.style.backgroundColor = 'black';";
         jsRuntime.InvokeVoidAsync("eval", script);
     }
 
     void OnTakenClicked(DrugRecord drug)
     {
-        // 執行你想要在按下 Taken 按鈕時執行的程式碼
-        // 這裡是示例程式碼，可以在點擊後改變按鈕背景色
+        // 執行想要在按下 Taken 按鈕時執行的程式碼
+        // 可以在點擊後改變按鈕背景色
         string script = @"this.style.backgroundColor = 'black';";
         jsRuntime.InvokeVoidAsync("eval", script);
     }
