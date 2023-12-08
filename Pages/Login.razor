@@ -1,39 +1,82 @@
 ﻿@page "/login"
-@using MedicineCheckPage.Models
-@using System.Reflection
+@layout LoginLayout
+@using System.Text.RegularExpressions
+@inject NavigationManager NavigationManager // 在這裡注入 NavigationManager 服務
 
-@inject NavigationManager NavigationManager
 
-<div class="card">
-    <div class="card-body my-2">
-        <h1>Welcom!</h1>
-        <h3>登入</h3>
-        <hr />
-        <EditForm Model="Login" OnValidSubmit="SubmitHandler" OnInvalidSubmit="InvalidHandler">
 
-    <div class="form-group">
-                <label for="userName">身份證:</label><br />
-                <InputText @bind-Value="login.UserName" class="form-control" id="userName" /><br />
-            </div>
-    <div class="form-group">
-                <label for="pwd">密碼:</label><br />
-                <InputPassword @bind-Value="login.Password" class="form-control" id="pwd" /><br />
-            </div>
-            <span class="form-control-plaintext"></span>
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <button class="btn btn-primary">登入</button>
-                </div>
-            </div>
-        </EditForm>
+<h3>登入</h3>
+<hr />
+
+<div class="form-group">
+    <label for="idNumber">身份證：</label>
+    <input @bind-value="idNumber" id="idNumber" class="form-control" @oninput="ValidateIdNumber" />
+    <p>@idNumberError</p>
+</div>
+
+<div class="form-group">
+    <label for="password">密碼：</label>
+    <div class="input-group">
+        <input @bind-value="password" id="password" class="form-control" type="@((passwordVisible ? "text" : "password"))" />
+        <div class="input-group-append">
+            <button @onclick="TogglePasswordVisibility" class="btn btn-outline-secondary" type="button">
+                @if (passwordVisible)
+                {
+                    <i class="fas fa-eye-slash"></i>
+                }
+                else
+                {
+                    <i class="fas fa-eye"></i>
+                }
+            </button>
+        </div>
     </div>
 </div>
 
+<button @onclick="HandleLogin" class="btn btn-primary">登入</button>
+
+@if (loggedIn)
+{
+    <p>登入成功！</p>
+}
 
 @code {
-    private Login login = new Login();
+    private string idNumber;
+    private string password;
+    private bool loggedIn;
+    private string idNumberError;
+    private bool passwordVisible = false;
 
-    private void SubmitHandler() => Console.WriteLine($"身份證：{login.UserName} ，密碼：{login.Password}");
+    private void HandleLogin()
+    {
+        // Logic for login
+        loggedIn = true; // Just an example, no actual validation here
 
-    private void InvalidHandler() => Console.WriteLine($"身份證： {login.UserName} ，密碼：{login.Password}");
+        if (loggedIn)
+        {
+            NavigationManager.NavigateTo("/"); // 登入成功後導航至首頁
+        }
+    }
+
+    private void ValidateIdNumber(ChangeEventArgs e)
+    {
+        string input = e.Value.ToString();
+        Regex regex = new Regex("^[A-Z]\\d{11}$");
+
+        if (!regex.IsMatch(input))
+        {
+            idNumberError = "身份證格式錯誤，需包含一個大寫字母和11位數字";
+        }
+        else
+        {
+            idNumberError = null;
+        }
+    }
+
+    private void TogglePasswordVisibility()
+    {
+        passwordVisible = !passwordVisible;
+    }
 }
+
+
