@@ -3,7 +3,7 @@
 @using System <!-- 引入 System 命名空間 -->
 @using System.Collections.Generic <!-- 引入 System.Collections.Generic 命名空間 -->
 @inject IJSRuntime jsRuntime
-
+@inject NavigationManager NavigationManager
 
 <h3>@DateTime.Now.ToString("yyyy-MM-dd (dddd)")</h3>  <!-- 顯示當前日期和星期幾 -->
 <hr />
@@ -17,27 +17,45 @@
                 <div class="drug-info">
                     <img src="@drug.ImageUrl" alt="@drug.Name" class="drug-image" /><!-- 顯示藥物圖片 -->
                     <div class="details">
-                <h4>@drug.Name</h4> <!-- 顯示藥物名稱 -->
+                        <h4>@drug.Name</h4> <!-- 顯示藥物名稱 -->
                         <label for="timeInput">時間:</label>
                         <input type="time" id="timeInput" @bind="drug.Time" /><!-- 顯示當前時間 -->
-                <p>劑量: @drug.Dosage</p> <!-- 顯示藥物用量 -->
+                        <p>劑量: @drug.Dosage</p> <!-- 顯示藥物用量 -->
+                    </div>
                 </div>
-              </div>
                 <div class="buttons">
-                    <button class="btn-skip" @onclick="() => OnSkipClicked(drug)">跳過</button> <!-- 跳過按鈕 -->
-                    <button class="btn-taken" @onclick="() => OnTakenClicked(drug)">吃藥</button> <!-- 已吃藥按鈕 -->
-                <div />
+                    <button class="btn-skip" @onclick="() => OnSkipClicked(drug)">跳過</button>
+                    <button class="btn-taken" @onclick="() => OnTakenClicked(drug)">吃藥</button>
+                    @if (drug.ShowReasons) // 如果需要顯示原因選擇
+                    {
+                        <div class="reasons">
+                            <h7>未吃藥原因: @drug.Reason</h7>
+                            <label>
+                                <input type="radio" name="reason" value="forgot" @onclick="() => UpdateSelectedReason(drug, 'forgot')" checked=@(drug.SelectedReason == "forgot")>忘記吃藥
+                            </label>
+                            <label>
+                                <input type="radio" name="reason" value="dontWant" @onclick="() => UpdateSelectedReason(drug, 'dontWant')" checked=@(drug.SelectedReason == "dontWant")>不想吃吃藥
+                            </label>
+                            <label>
+                                <input type="radio" name="reason" value="other" @onclick="() => UpdateSelectedReason(drug, 'other')" checked=@(drug.SelectedReason == "other")>其他原因
+                            </label>
+                        </div>
+                    }
+                </div>
             </div>
-          </div>
         }
-     <hr />
-        <button class="btn-finish" @onclick="() => OnFinishClicked()">提交</button> <!-- 跳過按鈕 -->
+        <hr />
+        <div class="buttons">
+            <!-- 修改位置 -->
+            <button class="btn-finish" @onclick="() => OnFinishClicked()">提交</button> <!-- 跳過按鈕 -->
+        </div>
     </div>
 }
 else
 {
     <p>No drugs to track today.</p> <!-- 如果藥物清單為空，顯示無藥物追蹤的訊息 -->
 }
+
 
 @code {
     List<DrugRecord> drugRecords;
@@ -49,7 +67,9 @@ else
         {
             new DrugRecord { Name = "康肯", Dosage = "10mg", ImageUrl = "pill1.png" },
             new DrugRecord { Name = "普立妥", Dosage = "20mg", ImageUrl = "pill2.jpg" },
-            new DrugRecord { Name = "得安穩", Dosage = "10mg", ImageUrl = "pill3.jpg" }
+            new DrugRecord { Name = "得安穩", Dosage = "5mg", ImageUrl = "pill3.jpg" },
+            new DrugRecord { Name = "得安穩", Dosage = "8mg", ImageUrl = "pill4.jpg" },
+            new DrugRecord { Name = "好克寧", Dosage = "10mg", ImageUrl = "pill5.jpg" }
         };
     }
 
@@ -63,24 +83,53 @@ else
         <!-- 藥物圖片URL屬性 -->
         public DateTime Time { get; set; } 
         <!-- 藥物時間屬性 -->
+        public bool ShowReasons { get; set; } // Define the ShowReasons property
+        public String Reason{ get; set; }
+        public List<string> SideEffects { get; set; } // 副作用清單屬性
+        public string SelectedReason { get; set; } // 用於儲存使用者選擇的原因
     }
+}
+    public bool loggedIn;
     void OnSkipClicked(DrugRecord drug)
     {
-        // 執行想要在按下 Skip 按鈕時執行的程式碼
-        // 可以在點擊後改變按鈕背景色
-        string script = @"this.style.backgroundColor = 'black';";
-        jsRuntime.InvokeVoidAsync("eval", script);
+        drug.ShowReasons = true;
+        jsRuntime.InvokeVoidAsync("changeButtonColor", "btn-skipped");
     }
+
 
     void OnTakenClicked(DrugRecord drug)
     {
-        // 執行想要在按下 Taken 按鈕時執行的程式碼
-        // 可以在點擊後改變按鈕背景色
-        string script = @"this.style.backgroundColor = 'black';";
-        jsRuntime.InvokeVoidAsync("eval", script);
+        drug.ShowReasons = false;
+        jsRuntime.InvokeVoidAsync("changeButtonColor", "btn-taken");
+        if (drug.Name == "得安穩") // 如果是特定藥物
+        {
+            ShowSideEffectsForm(drug); // 顯示填寫副作用的表單
+        }
+        else
+        {
+            drug.ShowReasons = false;
+            jsRuntime.InvokeVoidAsync("changeButtonColor", "btn-taken");
+        }
     }
+
+    async Task ShowSideEffectsForm(DrugRecord drug)
+    {
+        // 使用 JavaScript 顯示填寫副作用的表單或彈出視窗
+        await jsRuntime.InvokeVoidAsync("showSideEffectsForm", drug.Name);
+
+        // 等待 JavaScript 調用完成並收集副作用資訊
+        drug.SideEffects = await jsRuntime.InvokeAsync<List<string>>("collectSideEffects");
+        drug.ShowReasons = false; // 關閉原因選擇
+
+        // 更改按鈕顏色
+        await jsRuntime.InvokeVoidAsync("changeButtonColor", "btn-taken");
+    }
+
     void OnFinishClicked()
     {
-        
+        if (loggedIn)
+        {
+            NavigationManager.NavigateTo("/ finish"); // 登入成功後導航至首頁
+        }
     }
 }

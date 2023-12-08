@@ -1,5 +1,5 @@
 ﻿body {
-    background-color: lightyellow;
+    background-color: ghostwhite;
 }
 
 
@@ -31,11 +31,12 @@
 
 .buttons {
     margin-left: auto; /* 讓按鈕群組靠右 */
+   
 }
 
 .btn-skip,
 .btn-taken {
-    background-color: blue; /* 按鈕背景色設為藍色 */
+    background-color: lightblue; /* 按鈕背景色設為藍色 */
     color: white; /* 文字顏色設為白色 */
     border: none; /* 移除按鈕邊框 */
     padding: 8px 12px; /* 調整按鈕內邊距 */
@@ -43,8 +44,9 @@
     cursor: pointer; /* 將滑鼠指標設為手型 */
 }
 
+
 .btn-finish{
-    background-color:darkblue;
+    background-color:navy;
     color:white;
     border:none;
     padding:8px 12px;
@@ -52,4 +54,14 @@
     align-items:center;
 }
 
+    .btn-skip:active,
+    .btn-taken:active,
+    .btn-finish:active {
+        background-color: gray; /* 點擊後的背景色變更為黑色 */
+        /* 可以添加其他需要改變的樣式 */
+    }
 
+.btn-clicked {
+    background-color: gray; /* 按下後的背景色 */
+    /* 其他需要改變的樣式 */
+}

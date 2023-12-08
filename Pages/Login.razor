@@ -2,12 +2,14 @@
 @layout LoginLayout
 @using System.Text.RegularExpressions
 @inject NavigationManager NavigationManager // 在這裡注入 NavigationManager 服務
+@inject IJSRuntime JSRuntime
 
 
 
 <h3>登入</h3>
 <hr />
 
+<link href="~/css/Login.css" rel="stylesheet" />
 <div class="form-group">
     <label for="idNumber">身份證：</label>
     <input @bind-value="idNumber" id="idNumber" class="form-control" @oninput="ValidateIdNumber" />
@@ -47,36 +49,59 @@
     private string idNumberError;
     private bool passwordVisible = false;
 
-    private void HandleLogin()
-    {
-        // Logic for login
-        loggedIn = true; // Just an example, no actual validation here
-
-        if (loggedIn)
-        {
-            NavigationManager.NavigateTo("/"); // 登入成功後導航至首頁
-        }
-    }
-
+    // 將 ValidateIdNumber 方法放在這個區塊內
     private void ValidateIdNumber(ChangeEventArgs e)
     {
         string input = e.Value.ToString();
-        Regex regex = new Regex("^[A-Z]\\d{11}$");
+        Regex regex = new Regex("^[A-Z]\\d{9}$");
 
         if (!regex.IsMatch(input))
         {
-            idNumberError = "身份證格式錯誤，需包含一個大寫字母和11位數字";
+            idNumberError = "身份證格式錯誤，需包含一個大寫字母和9位數字";
         }
         else
         {
-            idNumberError = null;
+            idNumberError = null; // 清除錯誤訊息
         }
     }
 
+    // TogglePasswordVisibility 方法
     private void TogglePasswordVisibility()
     {
         passwordVisible = !passwordVisible;
     }
+    private void HandleLogin()
+    {
+        bool isValidIdNumber = ValidateIdNumberFormat(idNumber);
+        bool isValidPassword = !string.IsNullOrWhiteSpace(password);
+
+        if (!isValidIdNumber || !isValidPassword)
+        {
+            // 條件不符合，顯示彈窗訊息
+            ShowErrorMessage();
+        }
+        else
+        {
+            loggedIn = true; 
+
+            if (loggedIn)
+            {
+                NavigationManager.NavigateTo("/"); // 登入成功後導航至首頁
+            }
+        }
+    }
+
+    private bool ValidateIdNumberFormat(string input)
+    {
+        Regex regex = new Regex("^[A-Z]\\d{9}$");
+        return regex.IsMatch(input);
+    }
+        // 這裡可以使用彈窗或其他方法來顯示錯誤訊息給使用者
+        // 例如使用 JavaScript 的警告框或顯示一個錯誤訊息在頁面上方
+        // 這裡提供一個示例使用 JavaScript 的警告框
+        private async Task ShowErrorMessage()
+        {
+            string errorMessage = "請輸入正確的身份證和密碼！";
+            await JSRuntime.InvokeVoidAsync("alert", errorMessage);
+    }
 }
-
-
