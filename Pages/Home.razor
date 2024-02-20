@@ -31,7 +31,7 @@
                         <div class="reasons">
                             <h7>未吃藥原因: @drug.Reason</h7>
                             <label><input type="radio" name="reason" value="forgot">忘記吃藥</label>
-                            <label><input type="radio" name="reason" value="dontWant">不想吃吃藥</label>
+                            <label><input type="radio" name="reason" value="dontWant">不想吃藥</label>
                             <label><input type="radio" name="reason" value="other">其他原因</label>
                             </div >
                     }
@@ -40,8 +40,7 @@
         }
         <hr />
         <div class="buttons">
-            <!-- 修改位置 -->
-            <button class="btn-finish" @onclick="() => OnFinishClicked()">提交</button> <!-- 跳過按鈕 -->
+            <button class="btn-finish" @onclick="() => OnFinishClicked()">提交</button> 
         </div>
     </div>
 }
@@ -50,6 +49,15 @@ else
     <p>No drugs to track today.</p> <!-- 如果藥物清單為空，顯示無藥物追蹤的訊息 -->
 }
 
+<script>
+    function changeButtonColor(buttonId) {
+        var button = document.getElementById(buttonId);
+        if (button) {
+            button.style.backgroundColor = "black"; // 將按鈕的背景色設置為黑色，表示按下的狀態
+            button.disabled = true; // 禁用按鈕，以防止進一步的點擊
+        }
+    }
+</script>
 
 @code {
     List<DrugRecord> drugRecords;
@@ -88,8 +96,8 @@ else
     {
         drug.ShowReasons = true;
         jsRuntime.InvokeVoidAsync("changeButtonColor", "btn-skipped");
+        loggedIn = true; // 設置按鈕已按下的狀態
     }
-
 
     void OnTakenClicked(DrugRecord drug)
     {

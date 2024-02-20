@@ -25,6 +25,7 @@
     </div>
 </div>
 
+<hr/>
 <button @onclick="HandleLogin" class="btn btn-primary">登入</button>
 
 @if (loggedIn)
@@ -36,8 +37,8 @@
     private string idNumber;
     private string password;
     private bool loggedIn;
-    private string idNumberError;
     private bool passwordVisible = false;
+    private MarkupString idNumberError;
 
     // 將 ValidateIdNumber 方法放在這個區塊內
     private void ValidateIdNumber(ChangeEventArgs e)
@@ -47,11 +48,11 @@
 
         if (!regex.IsMatch(input))
         {
-            idNumberError = "身份證格式錯誤，需包含一個大寫字母和9位數字";
+            idNumberError = new MarkupString($"<span style='color:red;'>身份證格式錯誤，需包含一個大寫字母和9位數字</span>");
         }
         else
         {
-            idNumberError = null; // 清除錯誤訊息
+            idNumberError = new MarkupString(""); // 清除錯誤訊息
         }
     }
 
@@ -86,10 +87,7 @@
         Regex regex = new Regex("^[A-Z]\\d{9}$");
         return regex.IsMatch(input);
     }
-        // 這裡可以使用彈窗或其他方法來顯示錯誤訊息給使用者
-        // 例如使用 JavaScript 的警告框或顯示一個錯誤訊息在頁面上方
-        // 這裡提供一個示例使用 JavaScript 的警告框
-        private async Task ShowErrorMessage()
+    private async Task ShowErrorMessage()
         {
             string errorMessage = "請輸入正確的身份證和密碼！";
             await JSRuntime.InvokeVoidAsync("alert", errorMessage);
